@@ -17,7 +17,6 @@ services:
   migrate:
     build:
       context: .
-      args:
     restart: "no"
     depends_on:
       db:
@@ -29,7 +28,6 @@ services:
   app:
     build:
       context: .
-      args:
     restart: unless-stopped
     depends_on:
       db:
