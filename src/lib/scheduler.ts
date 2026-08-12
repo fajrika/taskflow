@@ -1,6 +1,7 @@
 import "server-only";
 import cron from "node-cron";
 import { checkDailyReminders } from "@/lib/reminders";
+import { generateAllRecurrences } from "@/lib/recurrences";
 
 let running = false;
 
@@ -19,5 +20,16 @@ export function startScheduler() {
     }
   });
 
-  console.log("[scheduler] pengingat harian aktif (cek tiap menit)");
+  cron.schedule("*/15 * * * *", async () => {
+    try {
+      const created = await generateAllRecurrences();
+      if (created > 0) {
+        console.log(`[scheduler] tugas berulang: ${created} instance baru dibuat`);
+      }
+    } catch (err) {
+      console.error("[scheduler] error generate berulang:", err);
+    }
+  });
+
+  console.log("[scheduler] pengingat harian + tugas berulang aktif");
 }

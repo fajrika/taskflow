@@ -113,6 +113,11 @@ export default function TaskList({
                   >
                     {task.type === "main" ? "🏢 Utama" : "🚀 Side"}
                   </span>
+                  {task.recurrenceId && (
+                    <span className="rounded bg-emerald-600/30 px-1.5 py-0.5 text-[10px] text-emerald-300" title="Tugas berulang">
+                      🔁
+                    </span>
+                  )}
                   {task.status !== "done" && task.status !== "cancelled" && (
                     <span className={`text-[11px] ${due.cls}`}>{due.text}</span>
                   )}

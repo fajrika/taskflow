@@ -95,6 +95,9 @@ export const tasks = pgTable(
     status: text("status").notNull().default("todo"), // todo | in_progress | done | cancelled
     tags: jsonb("tags").$type<string[]>().default([]),
     completedAt: timestamp("completed_at", { withTimezone: true }),
+    recurrenceId: integer("recurrence_id").references(() => recurrences.id, {
+      onDelete: "cascade",
+    }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
@@ -102,7 +105,37 @@ export const tasks = pgTable(
     index("tasks_user_idx").on(t.userId),
     index("tasks_user_status_idx").on(t.userId, t.status),
     index("tasks_user_due_idx").on(t.userId, t.dueDate),
+    index("tasks_recurrence_idx").on(t.recurrenceId),
   ],
+);
+
+export const recurrences = pgTable(
+  "recurrences",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    type: text("type").notNull().default("main"), // "main" | "side"
+    clientId: integer("client_id").references(() => clients.id, { onDelete: "set null" }),
+    projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+    priority: text("priority").notNull().default("medium"),
+    tags: jsonb("tags").$type<string[]>().default([]),
+    // recurrence config
+    freq: text("freq").notNull().default("daily"), // "daily" | "weekly" | "cron"
+    weekdays: jsonb("weekdays").$type<number[]>().default([]), // 1=Senin .. 7=Minggu (ISO)
+    cron: text("cron"), // ekspresi cron (freq=cron)
+    time: text("time").notNull().default("08:00"), // HH:mm untuk daily/weekly
+    startsOn: timestamp("starts_on", { withTimezone: true }).notNull(),
+    endsOn: timestamp("ends_on", { withTimezone: true }), // null = tidak berakhir
+    active: boolean("active").notNull().default(true),
+    lastGeneratedAt: timestamp("last_generated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("recurrences_user_idx").on(t.userId)],
 );
 
 export const pushSubscriptions = pgTable(
@@ -150,10 +183,19 @@ export const usersRelations = relations(users, ({ many }) => ({
   clients: many(clients),
   projects: many(projects),
   pushSubscriptions: many(pushSubscriptions),
+  recurrences: many(recurrences),
 }));
 
 export const tasksRelations = relations(tasks, ({ one }) => ({
   user: one(users, { fields: [tasks.userId], references: [users.id] }),
   client: one(clients, { fields: [tasks.clientId], references: [clients.id] }),
   project: one(projects, { fields: [tasks.projectId], references: [projects.id] }),
+  recurrence: one(recurrences, { fields: [tasks.recurrenceId], references: [recurrences.id] }),
+}));
+
+export const recurrencesRelations = relations(recurrences, ({ one, many }) => ({
+  user: one(users, { fields: [recurrences.userId], references: [users.id] }),
+  client: one(clients, { fields: [recurrences.clientId], references: [clients.id] }),
+  project: one(projects, { fields: [recurrences.projectId], references: [projects.id] }),
+  tasks: many(tasks),
 }));
