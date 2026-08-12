@@ -8,6 +8,11 @@ Aplikasi manajemen pekerjaan ala Notion: tugas utama & side project, deadline, G
 - **Tugas** — judul, deskripsi, prioritas, tag, status, tanggal mulai & deadline.
   - **Pekerjaan utama** → wajib tahu **sumber kerja / pemberi tugas** (klien).
   - **Side job / proyekan** → masuk ke proyek dengan warna masing-masing.
+- **Tugas berulang 🔁** — satu template yang menghasilkan tugas otomatis:
+  - **Harian** (jam tertentu) atau **Mingguan** (pilih hari Sen–Min);
+  - **Cron custom** (mis. `0 8 * * *`) dengan pratinjau tanggal berikutnya;
+  - atur **mulai & selesai pengulangan** (tanpa selesai = berulang selamanya);
+  - instance dibuat otomatis (scheduler tiap 15 menit + segera saat dibuat), bisa dicentang selesai per hari, muncul di Gantt & pengingat harian; template bisa dijeda/aktifkan.
 - **Gantt chart** — timeline visual (1 minggu / 2 minggu / 1 bulan / 3 bulan), garis "hari ini", zoom & scroll otomatis ke hari ini.
 - **Dashboard** — ringkasan hari ini, terlambat, 7 hari ke depan, proyek aktif.
 - **Pengingat harian** — setiap hari di jam & zona waktu pilihan:
