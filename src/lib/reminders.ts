@@ -11,6 +11,7 @@ import {
 } from "@/lib/schema";
 import { sendPushToUser } from "@/lib/push";
 import { sendTelegramMessage, sendDiscordWebhook } from "@/lib/channels";
+import { getTelegramBotToken } from "@/lib/appSettings";
 import { fmtTime } from "@/lib/dates";
 
 const PRIORITY_LABEL: Record<string, string> = {
@@ -172,7 +173,8 @@ export async function sendReminderToUser(
   }
 
   if (!skip.includes("telegram") && settingsRow.telegramEnabled && settingsRow.telegramChatId) {
-    results.telegram = await sendTelegramMessage(settingsRow.telegramChatId, message);
+    const botToken = await getTelegramBotToken();
+    results.telegram = await sendTelegramMessage(botToken ?? "", settingsRow.telegramChatId, message);
   }
 
   if (!skip.includes("discord") && settingsRow.discordEnabled && settingsRow.discordWebhookUrl) {

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users, userSettings } from "@/lib/schema";
 import { requireUserId } from "@/lib/session";
+import { getAppSetting } from "@/lib/appSettings";
 import SettingsView from "@/components/SettingsView";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,7 @@ export default async function SettingsPage() {
 
   const [user] = await db.select().from(users).where(eq(users.id, userId));
   const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+  const botToken = await getAppSetting("telegram_bot_token");
 
   return (
     <div>
@@ -28,6 +30,7 @@ export default async function SettingsPage() {
           pushEnabled: settings?.pushEnabled ?? false,
           telegramEnabled: settings?.telegramEnabled ?? false,
           telegramChatId: settings?.telegramChatId ?? "",
+          telegramBotToken: botToken ?? "",
           discordEnabled: settings?.discordEnabled ?? false,
           discordWebhookUrl: settings?.discordWebhookUrl ?? "",
         }}

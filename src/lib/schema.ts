@@ -133,6 +133,17 @@ export const reminderLogs = pgTable(
   (t) => [uniqueIndex("reminder_logs_user_date_idx").on(t.userId, t.date)],
 );
 
+export const appSettings = pgTable(
+  "app_settings",
+  {
+    id: serial("id").primaryKey(),
+    key: text("key").notNull(),
+    value: text("value"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("app_settings_key_idx").on(t.key)],
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   settings: many(userSettings),
   tasks: many(tasks),

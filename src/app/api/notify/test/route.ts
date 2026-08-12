@@ -7,6 +7,7 @@ import { requireUserId } from "@/lib/session";
 import { sendReminderToUser, buildDailyMessage } from "@/lib/reminders";
 import { sendPushToUser } from "@/lib/push";
 import { sendTelegramMessage, sendDiscordWebhook } from "@/lib/channels";
+import { getTelegramBotToken } from "@/lib/appSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -54,12 +55,12 @@ export async function POST(req: Request) {
   if (channel !== "all" && enabledChannels.length === 0) {
     const chosen = channel;
     if (chosen === "push") results.push = await sendPushToUser(userId, { title: "🔔 Tes Taskflow", body: testMessage });
-    if (chosen === "telegram") results.telegram = await sendTelegramMessage(settings.telegramChatId!, testMessage);
+    if (chosen === "telegram") results.telegram = await sendTelegramMessage((await getTelegramBotToken()) ?? "", settings.telegramChatId!, testMessage);
     if (chosen === "discord") results.discord = await sendDiscordWebhook(settings.discordWebhookUrl!, testMessage);
   } else {
     for (const ch of enabledChannels) {
       if (ch === "push") results.push = await sendPushToUser(userId, { title: "🔔 Tes Taskflow", body: testMessage });
-      if (ch === "telegram") results.telegram = await sendTelegramMessage(settings.telegramChatId!, testMessage);
+      if (ch === "telegram") results.telegram = await sendTelegramMessage((await getTelegramBotToken()) ?? "", settings.telegramChatId!, testMessage);
       if (ch === "discord") results.discord = await sendDiscordWebhook(settings.discordWebhookUrl!, testMessage);
     }
   }

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { users, userSettings } from "@/lib/schema";
 import { requireUserId } from "@/lib/session";
+import { getAppSetting, setAppSetting } from "@/lib/appSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +16,32 @@ const updateSchema = z.object({
   pushEnabled: z.boolean().optional(),
   telegramEnabled: z.boolean().optional(),
   telegramChatId: z.string().max(100).optional().nullable(),
+  telegramBotToken: z.string().max(200).optional().nullable(),
   discordEnabled: z.boolean().optional(),
   discordWebhookUrl: z.string().max(500).optional().nullable(),
 });
+
+export async function GET() {
+  const userId = await requireUserId();
+
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
+  const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+  const botToken = await getAppSetting("telegram_bot_token");
+
+  return NextResponse.json({
+    name: user?.name ?? "",
+    email: user?.email ?? "",
+    timezone: settings?.timezone ?? "Asia/Jakarta",
+    remindTime: settings?.remindTime ?? "07:00",
+    dailyReminderEnabled: settings?.dailyReminderEnabled ?? true,
+    pushEnabled: settings?.pushEnabled ?? false,
+    telegramEnabled: settings?.telegramEnabled ?? false,
+    telegramChatId: settings?.telegramChatId ?? "",
+    telegramBotToken: botToken ?? "",
+    discordEnabled: settings?.discordEnabled ?? false,
+    discordWebhookUrl: settings?.discordWebhookUrl ?? "",
+  });
+}
 
 export async function PATCH(req: Request) {
   const userId = await requireUserId();
@@ -35,6 +59,11 @@ export async function PATCH(req: Request) {
   }
 
   const data = parsed.data;
+
+  if (data.telegramBotToken !== undefined) {
+    await setAppSetting("telegram_bot_token", data.telegramBotToken?.trim() || null);
+  }
+
   const settingsValues: Record<string, unknown> = {};
   for (const key of [
     "timezone",

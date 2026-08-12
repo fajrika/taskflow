@@ -1,8 +1,7 @@
 import "server-only";
 
-export async function sendTelegramMessage(chatId: string, text: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return { ok: false, reason: "TELEGRAM_BOT_TOKEN belum diatur" };
+export async function sendTelegramMessage(token: string, chatId: string, text: string) {
+  if (!token) return { ok: false, reason: "Token bot Telegram belum diatur" };
   if (!chatId) return { ok: false, reason: "Chat ID Telegram kosong" };
 
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

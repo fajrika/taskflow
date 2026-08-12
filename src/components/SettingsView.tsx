@@ -16,6 +16,7 @@ export interface SettingsData {
   pushEnabled: boolean;
   telegramEnabled: boolean;
   telegramChatId: string;
+  telegramBotToken: string;
   discordEnabled: boolean;
   discordWebhookUrl: string;
 }
@@ -60,6 +61,7 @@ export default function SettingsView({
         pushEnabled: form.pushEnabled,
         telegramEnabled: form.telegramEnabled,
         telegramChatId: form.telegramChatId,
+        telegramBotToken: form.telegramBotToken,
         discordEnabled: form.discordEnabled,
         discordWebhookUrl: form.discordWebhookUrl,
       }),
@@ -169,15 +171,26 @@ export default function SettingsView({
         </div>
         <div className="mb-4 pl-14 space-y-1.5">
           <input
+            value={form.telegramBotToken}
+            onChange={(e) => setForm((f) => ({ ...f, telegramBotToken: e.target.value }))}
+            className={inputCls}
+            placeholder="Token bot Telegram (dari @BotFather)"
+            type="password"
+          />
+          <p className="text-[11px] text-slate-500">
+            Bot token dipakai bersama untuk semua user (disimpan di aplikasi). Cara buat: chat{" "}
+            <code className="rounded bg-slate-800 px-1">@BotFather</code> → <code className="rounded bg-slate-800 px-1">/newbot</code> → salin token-nya ke sini.
+          </p>
+          <input
             value={form.telegramChatId}
             onChange={(e) => setForm((f) => ({ ...f, telegramChatId: e.target.value }))}
             className={inputCls}
-            placeholder="Chat ID (mis. 123456789)"
+            placeholder="Chat ID kamu (mis. 123456789)"
           />
           <p className="text-[11px] text-slate-500">
             Cara dapat Chat ID: mulai chat ke bot kamu, lalu buka{" "}
             <code className="rounded bg-slate-800 px-1">https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> dan cari
-            <code className="rounded bg-slate-800 px-1">chat.id</code>. Butuh token bot dari @BotFather (diatur admin di env TELEGRAM_BOT_TOKEN).
+            <code className="rounded bg-slate-800 px-1">chat.id</code>.
           </p>
         </div>
 
