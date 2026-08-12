@@ -36,10 +36,9 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export default function SettingsView({
   initial,
-  vapidKey,
 }: {
   initial: SettingsData;
-  vapidKey: string | null;
+
 }) {
   const [form, setForm] = useState<SettingsData>(initial);
   const [saving, setSaving] = useState(false);
@@ -158,7 +157,7 @@ export default function SettingsView({
           </div>
         </div>
         <div className="mb-4 pl-14">
-          <PushSetup vapidKey={vapidKey} enabled={form.pushEnabled} onChange={(v) => setForm((f) => ({ ...f, pushEnabled: f.pushEnabled || v }))} />
+          <PushSetup enabled={form.pushEnabled} onChange={(v) => setForm((f) => ({ ...f, pushEnabled: f.pushEnabled || v }))} />
         </div>
 
         <div className="mb-4 flex items-center gap-3">

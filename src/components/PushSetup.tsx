@@ -15,17 +15,23 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
 }
 
 export default function PushSetup({
-  vapidKey,
   enabled,
   onChange,
 }: {
-  vapidKey: string | null;
   enabled: boolean;
   onChange: (enabled: boolean) => void;
 }) {
   const [status, setStatus] = useState<"idle" | "supported" | "unsupported" | "subscribed">("idle");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [vapidKey, setVapidKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((d: { vapidPublicKey?: string | null }) => setVapidKey(d.vapidPublicKey ?? null))
+      .catch(() => setVapidKey(null));
+  }, []);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {

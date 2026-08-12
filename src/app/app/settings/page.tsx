@@ -19,7 +19,6 @@ export default async function SettingsPage() {
         <p className="text-sm text-slate-400">Profil, pengingat harian &amp; channel notifikasi</p>
       </div>
       <SettingsView
-        vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null}
         initial={{
           name: user?.name ?? "",
           email: user?.email ?? "",
